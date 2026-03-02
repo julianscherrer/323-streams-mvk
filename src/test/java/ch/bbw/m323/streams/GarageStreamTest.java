@@ -18,13 +18,15 @@ class GarageStreamTest implements WithAssertions {
 
 			record Car(String brand, String price, Wheel wheels, Radio radio) {
 
-				record Wheel(String brand, Integer amount) {}
+				record Wheel(String brand, Integer amount) {
+				}
 
 				record Radio(Boolean ukw, Bluetooth bluetooth) {
 
 					record Bluetooth(Integer version, List<Standard> standards) {
 
-						record Standard(String codec, Boolean partial) {}
+						record Standard(String codec, Boolean partial) {
+						}
 					}
 				}
 			}
@@ -39,8 +41,36 @@ class GarageStreamTest implements WithAssertions {
 		}
 	}
 
+	//Aufgabe 1 Finde die Namen aller Kunden welche 2 oder mehr Autos gekauft haben.
 	@Test
-	void aTest() {
+	void customersWithTwoOrMoreCars() {
+		//Aufgabe 3 Gehe nochmals durch die gelösten Aufgaben und ersetze alle Lambdas
+		//durch Methodenreferenzen oder (benannte) Variablen. Dies erhöht die Lesbarkeit komplexer Streamausdrücke.
 
+		java.util.function.Predicate<Inventory.Customer> hasTwoPlusCars =
+				customer -> customer.cars() != null && customer.cars().size() >= 2;
+
+		assertThat(inventory.products().stream()
+				.filter(customer -> customer.cars() != null && customer.cars().size() >= 2)
+				.map(Inventory.Customer::customer)
+				.toList()
+		).hasSizeBetween(10, 11);
+	}
+
+	//Aufgabe 2 Finde die Anzahl Autos mit verbautem UKW-Radio.
+	@Test
+	void carsWithUkwRadio() {
+		//Aufgabe 3 Gehe nochmals durch die gelösten Aufgaben und ersetze alle Lambdas
+		//durch Methodenreferenzen oder (benannte) Variablen. Dies erhöht die Lesbarkeit komplexer Streamausdrücke.
+
+		java.util.function.Predicate<Inventory.Customer.Car> hasUkw =
+				car -> car.radio() != null && car.radio().ukw() != null && car.radio().ukw();
+
+		assertThat(inventory.products().stream()
+				.filter(customer -> customer.cars() != null)
+				.flatMap(customer -> customer.cars().stream())
+				.filter(car -> car.radio() != null && car.radio().ukw() != null && car.radio().ukw())
+				.count()
+		).isIn(8L, 16L);
 	}
 }
